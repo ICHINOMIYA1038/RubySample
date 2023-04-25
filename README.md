@@ -45,3 +45,5 @@ $ rails server
 READMEを書き終わったら、この変更をコミットします。
 
 $ git commit -am "Improve the README"
+
+
