@@ -172,4 +172,79 @@ end
 ```
 
 
+本章で開発したユーザー登録フォームで送信すると、名前やメールアドレス、パスワードといったデータがネットワーク越しに流されています。
+実は、このようなネットワークに流れるデータは途中」で捕捉できるため、扱いには注意が必要です。
+
+これを修正するために Transport Layer Security　を使います。
+
+# TLS
+TLSは、ローカルのサーバーからネットワークにデータを送信する前に大事な情報を暗号化する技術です。
+今回は、ユーザー登録ページのためだけにTLSを導入しますが、これはWebサイト全体で適用できるために、ログイン機能をセキュアにしたり、セッションハイジャックの脆弱性に対抗したりする時にも多くの利点を生み出します。
+
+現在のRenderでは全ての接続でTLSを利用していますがWebホスト側がこのように振る舞うことに依存しない方がセキュリティ上有利です。
+
+Railsではありがたいことに、本番環境用の設定ファイルであるproduction.rbのコードをたった一行変更するだけで、あらゆるブラウザにTLSを強制し、https://による安全な通信を確立します。
+
+config.force_ssl を true　にします。
+このコードはファイル内にコメントアウトされた状態で存在しているので、実際にやることはコメントアウトを解除するだけです。
+
+config/environments/production.rb
+
+``` rb
+Rails.application.configure do
+  .
+  .
+  .
+  # Force all access to the app over SSL, use Strict-Transport-Security,
+  # and use secure cookies.
+  config.force_ssl = true
+  .
+  .
+  .
+end
+
+```
+
+この段階で、リモートサーバーにTLSを設定する必要があります。
+本番サイトでTLSを使えるようにするためには、自分のドメインで利用するTLS/SSL証明書を購入して設定する必要があります。
+これはかなり手間のかかる作業ですが、幸いここではそうした作業は不要です。
+Renderドメインの中で実行されるアプリケーションでは、RenderのTLS証明書が利用できるからです。
+もちろんこのサンプルアプリでも使えます。
+つまりこのアプリケーションをデプロイすれば、自動的にTLSが有効になります。
+
+TLSを導入したので、本番環境に適したWebサーバーの設定も必要です。
+本番環境ではPumaというHTTPサーバーを使います。
+Pumaは、大量のリクエストを受信できる能力を備えたサーバーです。
+最初のステップでは、gemをGemfileに追加することですが、Rails 5以降ではデフォルトでPumaが使えるようになっているので、最初のステップはスキップします。
+
+ここでは、Renderのドキュメントにしたがって、config/puma.rbのファイルの内容を置き換えます。
+
+
+```rb
+# Pumaの設定ファイル
+max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
+min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
+threads min_threads_count, max_threads_count
+port        ENV.fetch("PORT") { 3000 }
+environment ENV.fetch("RAILS_ENV") { "development" }
+pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
+workers ENV.fetch("WEB_CONCURRENCY") { 4 }
+preload_app!
+plugin :tmp_restart
+```
+
+最後に、先ほど設定したconfig/puma.rbファイルを使ってRenderがPumaのプロセスを実行できるように、RenderのStartCommandを設定します。
+Renderのダッシュボードの設定で、デフォルトのStartCommandをbundle exec puma -C config/puma.rbに置き換えます。
+
+
+
+
+
+
+
+
+
+
+
+
 
