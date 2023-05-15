@@ -58,6 +58,7 @@ class UsersController < ApplicationController
 
     # beforeフィルタ
 
+=begin applicationControllerにまとめて記述
     # ログイン済みユーザーかどうか確認
     def logged_in_user
       unless logged_in?
@@ -66,6 +67,7 @@ class UsersController < ApplicationController
         redirect_to login_url, status: :see_other
       end
     end
+=end
 
     # 正しいユーザーかどうか確認
     def correct_user

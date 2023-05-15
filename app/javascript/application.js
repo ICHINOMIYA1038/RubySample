@@ -2,3 +2,5 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "custom/menu"
+//画像アップロードの検証用のJavaScriptコードをImportmapでインポートする。
+import "custom/image_upload"

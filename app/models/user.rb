@@ -52,6 +52,14 @@ class << self
 end
 =end
 
+  def feed
+    Micropost.where("user_id = ?",id)
+    #?でSQLインジェクションを防止,?がエスケープされる。
+    
+  end
+
+  
+
 
   # 永続セッションのためにユーザーをデータベースに記憶する
   def remember
