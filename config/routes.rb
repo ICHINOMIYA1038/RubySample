@@ -9,7 +9,12 @@ Rails.application.routes.draw do
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
   delete "/logout", to:"sessions#destroy"
-  resources:users
+  resources :users do
+    member do
+      get :following, :followers
+    end
+  end
   resources :microposts,          only: [:create, :destroy]
+  resources :relationships,       only: [:create, :destroy]
   #get '/microposts', to: 'static_pages#home'
 end
